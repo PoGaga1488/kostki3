@@ -1,0 +1,146 @@
+package com.example.kostki;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.GridLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+public class MainActivity extends AppCompatActivity {
+    private EditText etLiczbaKostek;
+    private Button btnLosuj, btnRosnaco, btnMalejaco;
+    private GridLayout gridKostki;
+    private TextView tvWyniki;
+    private ArrayList<Integer> wyniki = new ArrayList<>();
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        WindowCompat.enableEdgeToEdge(getWindow());
+        setContentView(R.layout.activity_main);
+
+
+
+        etLiczbaKostek = findViewById(R.id.editTextLiczbaKostek);
+        btnLosuj = findViewById(R.id.buttonLosuj);
+        btnRosnaco = findViewById(R.id.buttonRosnaco);
+        btnMalejaco = findViewById(R.id.buttonMalejaco);
+        gridKostki = findViewById(R.id.gridKostki);
+        tvWyniki = findViewById(R.id.textViewWyniki);
+
+        gridKostki.setColumnCount(5); // тіпа колонки для сітки
+
+
+        btnLosuj.setOnClickListener(v -> losujKostki());
+        btnRosnaco.setOnClickListener(v -> sortujRosnaco());
+        btnMalejaco.setOnClickListener(v -> sortujMalejaco());
+
+
+
+    }
+    private void losujKostki() {
+        String tekst = etLiczbaKostek.getText().toString().trim();
+
+        if (tekst.isEmpty()) {
+            Toast.makeText(this, "Podaj liczbę kostek!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        int liczbaKostek = Integer.parseInt(tekst);
+
+        if (liczbaKostek <= 0 || liczbaKostek > 100) {
+            Toast.makeText(this, "Liczba kostek musi być od 1 do 100!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        wyniki.clear();
+        Random random = new Random();
+
+        for (int i = 0; i < liczbaKostek; i++) {
+            int los = random.nextInt(6) + 1;
+            wyniki.add(los);
+        }
+
+        odswiezWidok();
+    }
+
+    private void odswiezWidok() {
+        gridKostki.removeAllViews();
+
+
+        String tekstWynikow = "";
+
+        for (int i = 0; i < wyniki.size(); i++) {
+            int wartosc = wyniki.get(i);
+
+            TextView kostkaView = new TextView(this);
+            kostkaView.setText(String.valueOf(wartosc));
+            kostkaView.setTextSize(22);
+            kostkaView.setGravity(android.view.Gravity.CENTER);
+            kostkaView.setBackgroundColor(0xF3E5E0E0);
+
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = 110;
+            params.height = 110;
+            params.setMargins(8, 8, 8, 8);
+            kostkaView.setLayoutParams(params);
+
+            gridKostki.addView(kostkaView);
+
+
+            tekstWynikow += " " + wartosc;
+
+
+
+        }
+
+
+        tvWyniki.setText(tekstWynikow);
+    }
+
+    private void sortujRosnaco() {
+        if (wyniki.isEmpty()) {
+            Toast.makeText(this, "Najpierw należy wylosować kostki!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (int i = 0; i < wyniki.size() - 1; i++) {
+            for (int j = 0; j < wyniki.size() - 1 - i; j++) {    // булька сортує -і щоб не дрочити найбільше число
+                if (wyniki.get(j) > wyniki.get(j + 1)) {        // тово дивится що більше перше чи наступне
+                    java.util.Collections.swap(wyniki, j, j + 1);
+                }
+            }
+        }
+
+        odswiezWidok();
+    }
+
+    private void sortujMalejaco() {
+        if (wyniki.isEmpty()) {
+            Toast.makeText(this, "Najpierw należy wylosować kostki!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (int i = 0; i < wyniki.size() - 1; i++) {
+            for (int j = 0; j < wyniki.size() - 1 - i; j++) {
+                if (wyniki.get(j) < wyniki.get(j + 1)) {
+                    java.util.Collections.swap(wyniki, j, j + 1);
+                }
+            }
+        }
+
+        odswiezWidok();
+    }
+
+}
